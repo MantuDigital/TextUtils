@@ -1,6 +1,7 @@
 # I have created this file - Harry
 from django.http import HttpResponse
 from django.shortcuts import render
+import urllib.parse
 
 
 def index(request):
@@ -17,8 +18,16 @@ def analyze(request):
     newlineremover = request.POST.get('newlineremover', 'off')
     extraspaceremover = request.POST.get('extraspaceremover', 'off')
     numberremover = request.POST.get('numberremover','off')
+    encodeTxt = request.POST.get('urlencode','off')
+    print(encodeTxt)
 
     #Check which checkbox is on
+    if encodeTxt == "on":
+        analyzed = urllib.parse.quote_plus(djtext)
+        params = {'purpose':'Removed Punctuations', 'analyzed_text': analyzed}
+        djtext = analyzed
+        #return render(request, 'analyze.html', params) # return becouse url encode have punc value for example %22 %25 etc.
+
     if removepunc == "on":
         punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
         analyzed = ""
@@ -71,7 +80,7 @@ def analyze(request):
         djtext = analyzed
 
     
-    if(removepunc != "on" and newlineremover!="on" and extraspaceremover!="on" and fullcaps!="on" and numberremover != "on"):
+    if(encodeTxt != "on" and removepunc != "on" and newlineremover!="on" and extraspaceremover!="on" and fullcaps!="on" and numberremover != "on"):
         return HttpResponse("please select any operation and try again")
 
     return render(request, 'analyze.html', params)
